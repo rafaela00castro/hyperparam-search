@@ -7,15 +7,20 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 
-def run_sgd(dataset, find_best_params):
+def run_sgd(train, test, find_best_params):
 
-    X = loadtxt(dataset, usecols=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), unpack=True, delimiter=',').T
-    Y = loadtxt(dataset, unpack=True, usecols=(11), delimiter=',')
+    X_train = loadtxt(train, usecols=(0), unpack=True, delimiter=',').T
+    y_train = loadtxt(train, unpack=True, usecols=(1), delimiter=',')
 
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+    X_test = loadtxt(test, usecols=(0), unpack=True, delimiter=',').T
+    y_test = loadtxt(test, unpack=True, usecols=(1), delimiter=',')
+
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
     print('Data loaded!')
+    X_train = X_train.reshape(-1, 1)
+    X_test = X_test.reshape(-1, 1)
+    X_val = X_val.reshape(-1, 1)
 
     hyperparam_elapsed = time.time()
     best_params = find_best_params(X_train, y_train)

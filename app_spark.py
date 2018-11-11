@@ -12,4 +12,4 @@ if __name__ == '__main__':
     print("Score: ", score)
     print("Mean squared error: ", mse)
     print("Variance score: ", r2)
-    print("Tempo da busca: %s segundos" % hyperparam_elapsed)
+    print("Tempo da busca: %s segundos." % round(hyperparam_elapsed, 3))
