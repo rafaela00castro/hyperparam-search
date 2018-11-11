@@ -7,8 +7,9 @@ if __name__ == '__main__':
 
     dataset = 'datasets/dataset.csv'
 
-    score, mse, r2 = lr.run_sgd(dataset, find_best_params)
+    score, mse, r2, hyperparam_elapsed = lr.run_sgd(dataset, find_best_params)
 
     print("Score: ", score)
     print("Mean squared error: ", mse)
     print("Variance score: ", r2)
+    print("Tempo da busca: %s segundos." % round(hyperparam_elapsed, 3))

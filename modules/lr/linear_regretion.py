@@ -1,3 +1,4 @@
+import time
 from numpy import loadtxt
 
 from sklearn.model_selection import train_test_split
@@ -16,7 +17,9 @@ def run_sgd(dataset, find_best_params):
 
     print('Data loaded!')
 
+    hyperparam_elapsed = time.time()
     best_params = find_best_params(X_train, y_train)
+    hyperparam_elapsed = time.time() - hyperparam_elapsed
 
     model = SGDRegressor(
         learning_rate=best_params['learning_rate'],
@@ -36,4 +39,4 @@ def run_sgd(dataset, find_best_params):
     mse = mean_squared_error(real, pred)
     r2 = r2_score(real, pred)
 
-    return score, mse, r2
+    return score, mse, r2, hyperparam_elapsed
