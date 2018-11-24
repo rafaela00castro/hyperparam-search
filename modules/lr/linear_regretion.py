@@ -9,8 +9,7 @@ from sklearn.metrics import r2_score
 import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 
-def run_sgd(train, test, find_best_params):
-
+def load_data(train, test):
     X_train = loadtxt(train, usecols=(0), unpack=True, delimiter=',').T
     y_train = loadtxt(train, unpack=True, usecols=(1), delimiter=',')
 
@@ -19,10 +18,13 @@ def run_sgd(train, test, find_best_params):
 
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
+    return X_train.reshape(-1, 1), y_train, X_test.reshape(-1, 1), y_test, X_val.reshape(-1, 1), y_val
+
+
+def run_sgd(train, test, find_best_params):
+
+    X_train, y_train, X_test, y_test, X_val, y_val = load_data(train, test)
     print('Data loaded!')
-    X_train = X_train.reshape(-1, 1)
-    X_test = X_test.reshape(-1, 1)
-    X_val = X_val.reshape(-1, 1)
 
     hyperparam_elapsed = time.time()
     best_params = find_best_params(X_train, y_train)
