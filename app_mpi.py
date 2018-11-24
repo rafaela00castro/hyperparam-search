@@ -5,9 +5,10 @@ if __name__ == '__main__':
 
     print(" [ MPI IMP ] ")
 
-    dataset = 'datasets/dataset.csv'
+    train = 'datasets/test.csv'
+    test = 'datasets/test.csv'
 
-    score, mse, r2, hyperparam_elapsed = lr.run_sgd(dataset, find_best_params)
+    score, mse, r2, hyperparam_elapsed = lr.run_sgd(train, test, find_best_params)
 
     print("Score: ", score)
     print("Mean squared error: ", mse)
