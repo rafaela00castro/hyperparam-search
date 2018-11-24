@@ -3,15 +3,17 @@ from numpy import random
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.linear_model import SGDRegressor
 
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 def find_best_params(X, y):
-    eta0 = random.uniform(low=0.00001, high=0.001, size=100)
+    random.seed(42)
+    max_iter = random.randint(low=5, high=20, size=100) # discrete uniform distribution
     alpha = random.uniform(low=0.001, high=0.1, size=100)
 
     # create random grid
     param_grid = {
-        'learning_rate': ['optimal', 'invscaling'],
-        'eta0': eta0,
+        'max_iter': max_iter,
         'alpha': alpha
     }
 

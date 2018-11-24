@@ -6,6 +6,8 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 def run_sgd(train, test, find_best_params):
 
@@ -27,10 +29,8 @@ def run_sgd(train, test, find_best_params):
     hyperparam_elapsed = time.time() - hyperparam_elapsed
 
     model = SGDRegressor(
-        learning_rate=best_params['learning_rate'],
-        eta0=best_params['eta0'],
         alpha=best_params['alpha'],
-        max_iter=700,
+        max_iter=best_params['max_iter'],
         random_state=42
     )
     model.fit(X_train, y_train)
