@@ -15,7 +15,7 @@ def __run_search():
     alpha = None
 
     print('Exec parallel job')
-    exec_result = os.popen("mpiexec -n 4 python modules/mpi/mpi_search.py 4").read()
+    exec_result = os.popen("PYTHONPATH=. mpiexec -n 4 python modules/mpi/mpi_search.py 4").read()
     print('done!')
 
     print('Result:')
