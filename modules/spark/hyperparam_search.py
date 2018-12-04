@@ -1,22 +1,50 @@
-from numpy import random
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+from pyspark.sql.types import StructType, StructField, FloatType
+from pyspark.mllib.random import RandomRDDs
+from pyspark.ml.regression import LinearRegression
+from pyspark.ml.evaluation import RegressionEvaluator
+from pyspark.ml.linalg import Vectors
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 
-from sklearn.linear_model import SGDRegressor
-
+import numpy as np
 
 def find_best_params(X, y):
-    eta0 = random.uniform(low=0.00001, high=0.001, size=100)
-    alpha = random.uniform(low=0.001, high=0.1, size=100)
+    spark, sc = __start_session()
+    
+    seed = 42
+    param_size = 100
+    sample_size = 500
+    parallelism = sc.defaultParallelism
+    
+    train_numpy = np.concatenate((X, y[:, np.newaxis]), axis=1)
+    train = sc.parallelize(train_numpy) \
+              .map(lambda r: [Vectors.dense(r[0]),float(r[1])]) \
+              .toDF(['features','label']) \
+              .repartition(parallelism) \
+              .cache()
+    
+    reg_param = RandomRDDs.uniformRDD(sc, size=param_size, seed=seed) \
+                          .map(lambda x: 0.001 + (0.1 - 0.001) * x) \
+                          .collect()
+
+    max_iter = RandomRDDs.uniformRDD(sc, size=param_size, seed=seed) \
+                          .map(lambda x: int(5 + (20 - 5) * x)) \
+                          .collect()
 
     # create random grid
-    param_grid = {
-        'learning_rate': ['optimal', 'invscaling'],
-        'eta0': eta0,
-        'alpha': alpha
-    }
+    estimator = LinearRegression(solver='normal')
+    param_grid = ParamGridBuilder().addGrid(estimator.regParam, reg_param) \
+                                   .addGrid(estimator.maxIter, max_iter) \
+                                   .build()
 
-    estimator = SGDRegressor()
+    param_grid = sc.parallelize(param_grid) \
+                    .takeSample(withReplacement=False, num=sample_size, seed=seed)
 
-    best_params = __run_search(estimator, param_grid, X, y)
+    best_params = __run_search(estimator, param_grid, train, seed, parallelism)
+    
+    train.unpersist()
+    spark.stop()
 
     # print results
     print('Best Params:', best_params)
@@ -24,16 +52,37 @@ def find_best_params(X, y):
     return best_params
 
 
-def __run_search(estimator, param_grid, X, y):
-    lr = None
-    eta0 = None
-    alpha = None
+def __run_search(estimator, param_grid, train, seed, parallelism):
+    kfold = 2
+    seed = 42
+    grid_size = len(param_grid)
+    eval = RegressionEvaluator(metricName='mse')
+        
+    cv = CrossValidator(estimator=estimator, estimatorParamMaps=param_grid, 
+                        evaluator=eval, numFolds=kfold,
+                        seed=seed, parallelism=parallelism)
 
-    # TODO implementar o metodo aqui para selecionar os mellhores param
+    print('Fitting {} folds for each of {} candidates, totalling {} fits'
+          .format(kfold, grid_size, kfold * grid_size))
+    model = cv.fit(train)
+
+    # check the best parameters
+    best_model = model.bestModel
+    best_params = best_model.extractParamMap()
+    max_iter_key = best_model.getParam('maxIter')
+    reg_param_key = best_model.getParam('regParam')
 
     return {
-        'learning_rate': lr,
-        'eta0': eta0,
-        'alpha': alpha
+        'max_iter': best_params[max_iter_key],
+        'alpha': best_params[reg_param_key]
     }
 
+def __start_session():
+    spark = SparkSession.builder \
+                        .master('local[*]') \
+                        .appName('Random-search') \
+                        .getOrCreate()
+    sc = spark.sparkContext
+    print('Versão do Spark: ', sc.version)
+    
+    return spark, sc
