@@ -25,12 +25,17 @@ $ docker exec -it random-hsearch /bin/bash
 
 ### Execução dos script .py 
 
-``
+```
 $ cd hyperparam-search
+
 $ python app_sklearn.py
+
 $ python app_mpi.py
+
 $ python app_spark.py
-``
+
+exit
+```
 
 ### Docker Conteiner Stop: parada e remoção do container
 

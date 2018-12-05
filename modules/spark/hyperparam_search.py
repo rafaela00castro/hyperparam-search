@@ -83,6 +83,7 @@ def __start_session():
                         .appName('Random-search') \
                         .getOrCreate()
     sc = spark.sparkContext
+    sc.setLogLevel('ERROR')
     print('Versão do Spark: ', sc.version)
     
     return spark, sc
