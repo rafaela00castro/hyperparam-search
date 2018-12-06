@@ -1,6 +1,9 @@
 from modules.lr import linear_regretion as lr
 from modules.spark.hyperparam_search import find_best_params
 
+def run(train, test):
+    return lr.run_sgd(train, test, find_best_params)
+
 if __name__ == '__main__':
 
     print(" [ SPARK IMP ] ")
@@ -8,7 +11,7 @@ if __name__ == '__main__':
     train = 'datasets/test.csv'
     test = 'datasets/test.csv'
 
-    score, mse, r2, hyperparam_elapsed = lr.run_sgd(train, test, find_best_params)
+    score, mse, r2, hyperparam_elapsed = run(train, test)
 
     print("Score: ", score)
     print("Mean squared error: ", mse)
