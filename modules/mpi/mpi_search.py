@@ -15,6 +15,7 @@ from modules.lr.linear_regretion import load_data
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("n_jobs", type=int)
+    parser.add_argument("-s", action="store", dest="seed")
 
     return parser.parse_args()
 
@@ -24,6 +25,8 @@ if __name__ == '__main__':
     rank = comm.Get_rank()
 
     result = []
+    random_state = get_args().seed
+    settings.init(random_state)
 
     if rank == 0:
         numpy.random.seed(settings.seed)

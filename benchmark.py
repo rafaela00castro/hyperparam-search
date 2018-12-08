@@ -56,7 +56,7 @@ if __name__ == '__main__':
     
     execute(*params, sklearn_run, " [ SKLEARN IMP ] ")
     
-    #execute(*params, mpi_run, " [ MPI IMP ] ")
+    execute(*params, mpi_run, " [ MPI IMP ] ")
     
     execute(*params, spark_run, " [ SPARK IMP ] ")
 

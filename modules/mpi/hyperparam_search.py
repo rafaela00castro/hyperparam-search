@@ -1,4 +1,5 @@
 import os
+import settings
 
 
 def find_best_params(X, y):
@@ -13,9 +14,10 @@ def find_best_params(X, y):
 def __run_search():
     max_iter = None
     alpha = None
+    seed = str(settings.seed)
 
     print('Exec parallel job')
-    exec_result = os.popen("PYTHONPATH=. mpiexec -n 4 python modules/mpi/mpi_search.py 4").read()
+    exec_result = os.popen("PYTHONPATH=. mpiexec --mca btl_vader_single_copy_mechanism none -n 4 python modules/mpi/mpi_search.py 4 -s " + seed).read()
     print('done!')
 
     print('Result:')
