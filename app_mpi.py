@@ -1,6 +1,8 @@
 from modules.lr import linear_regretion as lr
 from modules.mpi.hyperparam_search import find_best_params
 
+import settings 
+
 def run(train, test):
     return lr.run_sgd(train, test, find_best_params)
 
@@ -11,6 +13,7 @@ if __name__ == '__main__':
     train = 'datasets/test.csv'
     test = 'datasets/test.csv'
 
+    settings.init()
     score, mse, r2, hyperparam_elapsed = run(train, test)
 
     print("Score: ", score)

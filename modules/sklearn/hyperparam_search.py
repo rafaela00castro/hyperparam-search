@@ -3,11 +3,12 @@ from numpy import random
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.linear_model import SGDRegressor
 
+import settings
 import warnings
 warnings.filterwarnings('ignore', category=FutureWarning)
 
 def find_best_params(X, y):
-    random.seed(42)
+    random.seed(settings.seed)
     max_iter = random.randint(low=5, high=20, size=100) # discrete uniform distribution
     alpha = random.uniform(low=0.001, high=0.1, size=100)
 
@@ -34,7 +35,7 @@ def __run_search(estimator, param_grid, X, y):
         param_distributions=param_grid,
         scoring='neg_mean_squared_error',
         n_iter=500, cv=2, verbose=1,
-        random_state=42, n_jobs=-1
+        random_state=settings.seed, n_jobs=-1
     )
     # Fit the model
     search.fit(X, y)

@@ -2,6 +2,7 @@ import argparse
 import itertools
 import random
 import numpy
+import settings
 
 from mpi4py import MPI
 
@@ -25,6 +26,7 @@ if __name__ == '__main__':
     result = []
 
     if rank == 0:
+        numpy.random.seed(settings.seed)
         max_iter = numpy.random.randint(low=5, high=20, size=100)
         alpha = numpy.random.uniform(low=0.001, high=0.1, size=100)
 
@@ -65,7 +67,7 @@ if __name__ == '__main__':
         model = SGDRegressor(
             alpha=set[1],
             max_iter=set[0],
-            random_state=42
+            random_state=settings.seed
         )
 
         model.fit(data['X'], data['y'])

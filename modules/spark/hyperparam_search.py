@@ -1,6 +1,4 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col
-from pyspark.sql.types import StructType, StructField, FloatType
 from pyspark.mllib.random import RandomRDDs
 from pyspark.ml.regression import LinearRegression
 from pyspark.ml.evaluation import RegressionEvaluator
@@ -8,11 +6,11 @@ from pyspark.ml.linalg import Vectors
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 
 import numpy as np
+import settings
 
 def find_best_params(X, y):
     spark, sc = __start_session()
     
-    seed = 42
     param_size = 100
     sample_size = 500
     parallelism = sc.defaultParallelism
@@ -24,11 +22,11 @@ def find_best_params(X, y):
               .repartition(parallelism) \
               .cache()
     
-    reg_param = RandomRDDs.uniformRDD(sc, size=param_size, seed=seed) \
+    reg_param = RandomRDDs.uniformRDD(sc, size=param_size, seed=settings.seed) \
                           .map(lambda x: 0.001 + (0.1 - 0.001) * x) \
                           .collect()
 
-    max_iter = RandomRDDs.uniformRDD(sc, size=param_size, seed=seed) \
+    max_iter = RandomRDDs.uniformRDD(sc, size=param_size, seed=settings.seed) \
                           .map(lambda x: int(5 + (20 - 5) * x)) \
                           .collect()
 
@@ -39,9 +37,9 @@ def find_best_params(X, y):
                                    .build()
 
     param_grid = sc.parallelize(param_grid) \
-                    .takeSample(withReplacement=False, num=sample_size, seed=seed)
+                    .takeSample(withReplacement=False, num=sample_size, seed=settings.seed)
 
-    best_params = __run_search(estimator, param_grid, train, seed, parallelism)
+    best_params = __run_search(estimator, param_grid, train, parallelism)
     
     train.unpersist()
     spark.stop()
@@ -52,15 +50,14 @@ def find_best_params(X, y):
     return best_params
 
 
-def __run_search(estimator, param_grid, train, seed, parallelism):
+def __run_search(estimator, param_grid, train, parallelism):
     kfold = 2
-    seed = 42
     grid_size = len(param_grid)
     eval = RegressionEvaluator(metricName='mse')
         
     cv = CrossValidator(estimator=estimator, estimatorParamMaps=param_grid, 
                         evaluator=eval, numFolds=kfold,
-                        seed=seed, parallelism=parallelism)
+                        seed=settings.seed, parallelism=parallelism)
 
     print('Fitting {} folds for each of {} candidates, totalling {} fits'
           .format(kfold, grid_size, kfold * grid_size))
