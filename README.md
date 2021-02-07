@@ -1,35 +1,35 @@
-# hyperparam-search
+# A benchmark for random search implementations
 ___
 
-Computação paralela e distribuída
+In this work, a colleague and I performed a benchmark between MPI4Py and PySpark for a hyperparameter search method known as Random Search. We applied the Scikit-learn implementation as a baseline. Experimental results show that MPI implementation for random search during the training phase of 1000 regression models was almost 3x faster than Spark.
 
-Exercício de disciplina.
+*disclaimer: This work provides only an initial analysis. For fair comparison, these experiments should also be performed for big data and more complex machine learning models.*
 
-### Docker Build: construção da imagem com MPI e Spark
+### Docker Build: building the image with MPI and Spark
 
 ``
 $ docker build -t hsearch .
 ``
 
-### Docker Run: execução do container
+### Docker Run: container execution
 
 ``
 $ docker run --rm -d -p 8888:8888 --name=random-hsearch hsearch
 ``
 
-### Docker Exec: chamada ao terminal do container para executar scripts .py 
+### Docker Exec: using to the container terminal to execute .py scripts 
 
 ``
 $ docker exec -it random-hsearch /bin/bash
 ``
 
-### Execução dos scripts .py 
+### Execution of .py scripts 
 
 ```
 $ cd hyperparam-search
 ```
 
-Scripts que executam o método Random Search para o problema de otimização de hiperparâmetros de forma paralela.
+Scripts that execute the Random Search method for the problem of optimizing hyperparameters in parallel.
 ```
 $ python app_sklearn.py
 
@@ -38,15 +38,14 @@ $ python app_mpi.py
 $ python app_spark.py
 ```
 
-Script para executar o benchmark das implementações acima. Ao executar `python benchmark.py` por padrão o script executará 10 iterações para cada *framework*, definindo um *seed* para gerar os mesmos números aleatórios, e assim garantir resultados reprodutíveis. Para mudar o número de execuções e gerar diferentes hiperparâmetros a cada execução (variabilidade nos resultados), executar o script conforme indicado abaixo.
+Script to benchmark the implementations above. When running `python benchmark.py` by default the script will perform 10 iterations for each framework, defining a seed to generate the same random numbers, and thus ensure reproducible results. To change the number of runs and generate different hyperparameters for each run (variability in results), run the script as indicated below.
 ```
 $ python benchmark.py -i 2 -s none
 
 $ exit
 ```
 
-### Docker Conteiner Stop: parada e remoção do container
-
+### Docker Conteiner Stop: stopping and removing the container
 ``
 $ docker container stop random-hsearch
 ``
