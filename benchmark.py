@@ -10,17 +10,17 @@ import settings
 
 def get_arguments():
     parser = arg.ArgumentParser()
-    parser.add_argument('-i', '--iteractions', action='store', dest='iteractions', default=10)
+    parser.add_argument('-i', '--iterations', action='store', dest='iterations', default=10)
     parser.add_argument('-s', '--seed', action='store', dest='seed', default=42)
 
     return parser.parse_args()
 
-def execute(train, test, n_iteractions, run, description):
+def execute(train, test, n_iterations, run, description):
     print(description)
     
     scores, mses, r2s, time = [], [], [], []
     
-    for i in range(n_iteractions):
+    for i in range(n_iterations):
         score, mse, r2, hyperparam_elapsed = run(train, test)
         scores.append(round(score, 5))
         mses.append(round(mse, 5))
@@ -28,7 +28,7 @@ def execute(train, test, n_iteractions, run, description):
         time.append(round(hyperparam_elapsed, 5))
         
     print("\n=======================")
-    print("Mean and standard deviation after {} iteractions".format(n_iteractions))
+    print("Mean and standard deviation after {} iterations".format(n_iterations))
     print("Score: media:{0:.5f}, std: {1:.5f}".format(np.mean(scores), np.std(scores)))
     print("Mean squared error: media: {0:.5f}, std: {1:.5f}".format(np.mean(mses), np.std(mses)))
     print("Variance score: media: {0:.5f}, std: {1:.5f}".format(np.mean(r2s), np.std(r2s)))
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     args = get_arguments()
     settings.init(args.seed)
     
-    params = [train, test, int(args.iteractions)]
+    params = [train, test, int(args.iterations)]
     
     execute(*params, sklearn_run, " [ SKLEARN IMP ] ")
     
